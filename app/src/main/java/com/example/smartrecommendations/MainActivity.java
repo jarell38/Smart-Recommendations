@@ -1,8 +1,12 @@
 package com.example.smartrecommendations;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -14,7 +18,13 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import com.example.smartrecommendations.databinding.ActivityMainBinding;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EntryCrud entryCrud = new EntryCrud("entries.csv");
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -32,10 +43,48 @@ public class MainActivity extends AppCompatActivity {
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                final String title = "";
+                final Boolean watched = false;
+                final Boolean liked = false;
+
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Add an entry");
+
+                final EditText input = new EditText(MainActivity.this);
+                builder.setView(input);
+
+                builder.setPositiveButton("add to to-watch", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Entry entry = new Entry(input.getText().toString(), watched, liked);
+                        entryCrud.addEntry(entry);
+                    }
+                });
+
+                builder.setNeutralButton("add to watched", new DialogInterface.OnClickListener() {
+                    final Boolean watched = true;
+                    final Boolean liked = true;
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Entry entry = new Entry(input.getText().toString(), watched, liked);
+                        entryCrud.addEntry(entry);
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
+
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
